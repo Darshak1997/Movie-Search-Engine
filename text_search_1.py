@@ -254,10 +254,7 @@ def eval_score(query):
         new_score.append(new)
     
     sorted_score_list_final, sorted_score_list_idf, sorted_score_list_tf = cosine_similarity(relevant, query_vector, idf_vector, tf_vector)
-#    sorted_score_list = cosine_similarity(relevant, query_vector)
-#    print("final_final_eval_score: ", (sorted_score_list_idf[:5]))
-#    addition = sorted_score_list_final + sorted_score_list_idf + sorted_score_list_tf
-#    print("Addition is: ",addition[:5])
+
     for entry in sorted_score_list_final:
 ##        print("hello")
         doc_id = entry[0]
@@ -266,50 +263,11 @@ def eval_score(query):
 #        print(row)
         info = (row["Title"], row["Plot"] if isinstance(row["Plot"], str) else "", entry[1],row["imdbRating"])
         result.append(info)
-    print(result[0][1])
-#    import colorama
-#    from colorama import Fore, Back, Style
-#
-#    colorama.init()
-#    for i in processed_query:
-#        if i in result[0][1]:
-#            print(Back.GREEN + i + Style.RESET_ALL)
-#            new = Back.GREEN + i + Style.RESET_ALL
-#        result[i][1].replace(new)
-#            print(CRED + i + CEND)
-#    for entry in sorted_score_list_final:
-#        for entry in sorted_score_list_idf:
-#            for entry in sorted_score_list_idf:
-##        print("hello")
-#                doc_id = entry[0]
-##        print(entry[0])
-#                row = movie_row.loc[doc_id]
-##                print(row)
-#                info = (row["Title"], row["Plot"] if isinstance(row["Plot"], str) else "", entry[1],row["imdbRating"])
-#                result.append(info)
     new_score = None
 #    print(result[0:5])
     return result, processed_query
 
-#def get_movie_info(sorted_score_list):
-##    print("I am Getting movie info")
-#    result = []
-#    for entry in sorted_score_list:
-#        doc_id = entry[0]
-##        print(type(doc_id))
-##        if type(doc_id) == str:
-#        row = movie_row.loc[doc_id]
-#        info = (row["Poster"], row["Title"],
-#                row["Plot"] if isinstance(row["Plot"], str) else "",
-#                entry[1],
-#                row["imdbRating"])
-##        else:
-##            continue
-#        result.append(info)
-#    
-##    print(result[0:5])
-#    return result
-#
+
 
 #search_query = "Kid alone at home"
 #get_results(search_query)
