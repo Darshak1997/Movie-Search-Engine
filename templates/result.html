@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Which one will you watch?</title>
+
+    </head>
+    <style>
+        body{
+            background-color:rgb(243, 245, 247);
+        }
+        h1{
+            text-align: center;
+            font-size: 30px;
+        }
+        li{
+            font-family: "Times New Roman", Times, serif;
+            font-size: 20px;
+        }
+        ul {
+            background: #3399ff;
+            padding: 20px;
+        }
+        ul li{
+            background: #cce5ff;
+            margin: 5px;
+            font-family:'Times New Roman', Times, serif;
+            font-style: italic;
+            font-size: 20px;
+        }
+    </style>
+    <body>
+        <h1>Movies you wanna watch!!!!!!!</h1>
+        <h2>Your TOP 10 Suggestions are: </h2>
+            <ul type=none>
+                {%for i in result%}
+                %highlight_text%
+                <li>
+                    <!-- <p>Poster: {{i[0]}}</p> -->
+                    <p>Title: {{i[0]}}</p>
+                    <p>Plot: {{i[1]}}<mark> </mark></p>
+                    <p>TF-IDF Score: {{i[2]}}</p>
+                    <p>IMDB Rating: {{i[3]}}</p>
+                </li>
+                {% endfor%}
+            </ul>
+    </body>
+</html>
