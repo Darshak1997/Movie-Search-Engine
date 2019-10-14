@@ -31,16 +31,19 @@ With tf-idf normalization:
 
 Lemmatization:
 
-('Alone', 'A man who is stuck alone in his home and is being haunted by his dead wife.', 0.4432479421067452, nan),
- ('Home', 'Home is where you are.', 0.4358973946078705, nan), 
-('Home Alone Horror', 'A boy left home alone realizes he may not be totally alone.', 0.4139130726129726, 6.6), 
-('Home Alone: Purged', "There's something of value in an old family home. A group of scavengers gather to take it. Left home alone, 3 kids must try to stop them.", 0.39285220213737304, nan), 
-('A Girl Walks Home Alone at Night', 'A girl walks home alone at night and a man starts to follow her.', 0.3754790320456582, 6.5)
+('Alone', 'A man who is stuck alone in his home and is being haunted by his dead wife.', 0.4432479421067452, nan).
+
+ ('Home', 'Home is where you are.', 0.4358973946078705, nan).
+	
+('Home Alone Horror', 'A boy left home alone realizes he may not be totally alone.', 0.4139130726129726, 6.6).
+
+('Home Alone: Purged', "There's something of value in an old family home. A group of scavengers gather to take it. Left home alone, 3 kids must try to stop them.", 0.39285220213737304, nan).
+
+('A Girl Walks Home Alone at Night', 'A girl walks home alone at night and a man starts to follow her.', 0.3754790320456582, 6.5).
 
 
 References:
 1.	https://nlp.stanford.edu/IR-book/pdf/13bayes.pdf
 2.	https://gist.github.com/adolfoguimaraes/91fbef8beceabafdcef2b407639290d4
 3.	https://www.geeksforgeeks.org/python-lemmatization-with-nltk/
-4.	
 
