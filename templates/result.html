@@ -31,15 +31,17 @@
     <body>
         <h1>Movies you wanna watch!!!!!!!</h1>
         <h2>Your TOP 10 Suggestions are: </h2>
+        <h3>{{ highlight_text}}</h3>
             <ul type=none>
                 {%for i in result%}
-                %highlight_text%
                 <li>
                     <!-- <p>Poster: {{i[0]}}</p> -->
                     <p>Title: {{i[0]}}</p>
-                    <p>Plot: {{i[1]}}<mark> </mark></p>
+                    <p>Plot: {{i[1]}}<mark></mark></p>
                     <p>TF-IDF Score: {{i[2]}}</p>
-                    <p>IMDB Rating: {{i[3]}}</p>
+                    <p>IDF Score: {{i[3]}}</p>
+                    <p>TF Score: {{i[4]}}</p>
+                    <p>IMDB Rating: {{i[5]}}</p>
                 </li>
                 {% endfor%}
             </ul>

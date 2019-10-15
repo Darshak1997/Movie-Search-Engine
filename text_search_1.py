@@ -20,22 +20,17 @@ def create_inverted_index(x_data, x_cols):
         for col in x_cols.keys():
             if col != "imdbID":
                 col_values = getattr(row, col)
-#                print(col_values)
                 parameters = x_cols[col]
                 if parameters is None:
                      data.append(col_values if isinstance(col_values, str) else "")
                 else:
                     col_values = ast.literal_eval(col_values if isinstance(col_values, str) else '[]')
-#                    print(col_values)
-#                    break
                     if type(col_values)==bool:
                         continue
                     else:
                         for col_value in col_values:
-#                            print(col_value)
                             for param in parameters:
                                 data.append(col_value[param])
-#        insert(index, pre_processing(' '.join(data)))
         tokens = data_pre_processing(' '.join(data))
         for token in tokens:
             if token in inverted_index:
@@ -46,14 +41,11 @@ def create_inverted_index(x_data, x_cols):
                     value[index] = 1
                     value["df"] += 1
             else:
-                inverted_index[token] = {index: 1, "df": 1}   
-#    print(inverted_index)
+                inverted_index[token] = {index: 1, "df": 1}  
     stopwords_1()
                 
                 
 def data_pre_processing(data_string):
-#    for noise in noise_list:
-#        data_string = data_string.replace(noise, "")
     tokens = tokenizer.tokenize(data_string)
     processed_data = []
     for t in tokens:
@@ -128,17 +120,15 @@ def build_query_vector(processed_query):
 #            tf_vector[]
             idf = (math.log10(N/inverted_index[token]["df"]))
             idf_vector[token] = idf
+            
             tf_idf = tf*idf
             query_vector[token] = tf_idf
             sum1 += math.pow(tf_idf, 2)
-#            sum1 += tf_idf
     print("IDF: ", idf_vector)
-#    print("TF_IDF: ", query_vector)
     sum1 = math.sqrt(sum1)
-#    sum1 = sum(query_vector[token])
     for token in query_vector:
         query_vector[token] /= sum1
-#    print(query_vector[token] * document_vector[doc][token])[:10]
+#    query_vector[token] = tf_idf
     print("TF_IDF: ", query_vector)
     return query_vector, idf_vector, tf_vector
     
@@ -148,7 +138,10 @@ def cosine_similarity(relevant_docs, query_vector, idf_vector, tf_vector):
     score_map_final = {}
     score_map_idf = {}
     score_map_tf = {}
-    idf_list = []
+    score_idf_term = {}
+    idf_term_new = {}
+    score_tf_term = {}
+    tf_term_new = {}
 #    print(query_vector)
     for doc in relevant_docs:
         score_final = 0
@@ -157,23 +150,35 @@ def cosine_similarity(relevant_docs, query_vector, idf_vector, tf_vector):
         for token in query_vector:
             score_final += query_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
         for token in idf_vector:
-            score_idf += idf_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
-#            score_map_idf[token] = score_idf
-            idf_list.append(score_idf)
+#            print(idf_vector[token]*(document_vector[doc][token] if token in document_vector[doc] else 0))
+            score_idf = idf_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
+#            print("token: ", token, "Score: ",score_idf)
+            score_idf_term[token] = score_idf
+            score_idf_term_keys = list(score_idf_term.keys())
+            score_idf_term_values = list(score_idf_term.values())
+            
+            final_score_idf_term = list(zip(score_idf_term_keys, score_idf_term_values))
+            
         for token in tf_vector:
             score_tf = tf_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
 #            score += (query_vector[token])
+            score_tf_term[token] = score_idf
+            score_tf_term_keys = list(score_tf_term.keys())
+            score_tf_term_values = list(score_tf_term.values())
+            
+            final_score_tf_term = list(zip(score_tf_term_keys, score_tf_term_values))
+            
         score_map_final[doc] = score_final
         score_map_idf[doc] = score_idf
         score_map_tf[doc] = score_tf
+        
+        idf_term_new[doc] = final_score_idf_term
+        tf_term_new[doc] = final_score_tf_term
+#    print("DICT_IDF:", idf_term_new)
+#    print("DICT_IDF:", (idf_list))    
     sorted_score_map_final = sorted(score_map_final.items(), key=operator.itemgetter(1), reverse=True)
-    sorted_score_map_idf = sorted(score_map_idf.items(), key=operator.itemgetter(1), reverse=True)
-    sorted_score_map_tf = sorted(score_map_tf.items(), key=operator.itemgetter(1), reverse=True)
-#    print(sorted_score_map[:10])
-    print("Sorted Score_idf: ",sorted_score_map_idf[:5])
-    print("Sorted Score_tf: ",sorted_score_map_tf[:5])
-#    print("idf_list: ", idf_list[:10])
-    return sorted_score_map_final[:50], sorted_score_map_idf[:50], sorted_score_map_tf[:50]
+
+    return sorted_score_map_final[:50], tf_term_new, idf_term_new
 
 def get_results(query):
 #    print("I am getting you reults")
@@ -239,7 +244,6 @@ def eval_score(query):
     result = []
     
     processed_query = data_pre_processing(query)
-    print(processed_query)
     
     relevant = relevant_files(processed_query)
     
@@ -253,18 +257,17 @@ def eval_score(query):
         new = new_result.lower()
         new_score.append(new)
     
-    sorted_score_list_final, sorted_score_list_idf, sorted_score_list_tf = cosine_similarity(relevant, query_vector, idf_vector, tf_vector)
-
+    sorted_score_list_final, tf_new, idf_new = cosine_similarity(relevant, query_vector, idf_vector, tf_vector)
+#    print("Compare_idf: ", tf_new)
     for entry in sorted_score_list_final:
-##        print("hello")
         doc_id = entry[0]
 ##        print(entry[0])
         row = movie_row.loc[doc_id]
 #        print(row)
-        info = (row["Title"], row["Plot"] if isinstance(row["Plot"], str) else "", entry[1],row["imdbRating"])
+        info = (row["Title"], row["Plot"] if isinstance(row["Plot"], str) else "", entry[1], idf_new[doc_id], tf_new[doc_id], row["imdbRating"])
         result.append(info)
     new_score = None
-#    print(result[0:5])
+    print(result[0:5])
     return result, processed_query
 
 
