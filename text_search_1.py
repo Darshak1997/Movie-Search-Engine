@@ -117,14 +117,18 @@ def build_query_vector(processed_query):
 #            tf_idf = (1 + math.log10(processed_query.count(token))) * (math.log10(N/inverted_index[token]["df"]))
             tf = (1 + math.log10(processed_query.count(token)))
             tf_vector[token] = tf
+            print("tf_vector_for: ", processed_query.count(token))
 #            tf_vector[]
             idf = (math.log10(N/inverted_index[token]["df"]))
             idf_vector[token] = idf
+            print("tf_vector_for: ", idf_vector[token])
             
             tf_idf = tf*idf
             query_vector[token] = tf_idf
             sum1 += math.pow(tf_idf, 2)
+            
     print("IDF: ", idf_vector)
+    print("TF: ", tf_vector)
     sum1 = math.sqrt(sum1)
     for token in query_vector:
         query_vector[token] /= sum1
@@ -133,7 +137,7 @@ def build_query_vector(processed_query):
     return query_vector, idf_vector, tf_vector
     
 
-def cosine_similarity(relevant_docs, query_vector, idf_vector, tf_vector):
+def tf_idf_score(relevant_docs, query_vector, idf_vector, tf_vector, processed_query):
 #    print("I am cosine similarity")
     score_map_final = {}
     score_map_idf = {}
@@ -142,14 +146,28 @@ def cosine_similarity(relevant_docs, query_vector, idf_vector, tf_vector):
     idf_term_new = {}
     score_tf_term = {}
     tf_term_new = {}
+    score_tf_idf_term = {}
+    tf_idf_term_new = {}
 #    print(query_vector)
     for doc in relevant_docs:
         score_final = 0
         score_idf = 0
         score_tf = 0
+        score_tf_idf = 0
         for token in query_vector:
             score_final += query_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
-        for token in idf_vector:
+        
+        for token in query_vector:
+#            print(idf_vector[token]*(document_vector[doc][token] if token in document_vector[doc] else 0))
+            score_tf_idf = query_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
+#            print("token: ", token, "Score: ",score_idf)
+            score_tf_idf_term[token] = score_tf_idf
+            score_tf_idf_term_keys = list(score_tf_idf_term.keys())
+            score_tf_idf_term_values = list(score_tf_idf_term.values())
+            
+            final_score_tf_idf_term = list(zip(score_tf_idf_term_keys, score_tf_idf_term_values))
+            
+        for token in query_vector:
 #            print(idf_vector[token]*(document_vector[doc][token] if token in document_vector[doc] else 0))
             score_idf = idf_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
 #            print("token: ", token, "Score: ",score_idf)
@@ -160,9 +178,11 @@ def cosine_similarity(relevant_docs, query_vector, idf_vector, tf_vector):
             final_score_idf_term = list(zip(score_idf_term_keys, score_idf_term_values))
             
         for token in tf_vector:
+            
+#            print(tf_vector[token])
             score_tf = tf_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
 #            score += (query_vector[token])
-            score_tf_term[token] = score_idf
+            score_tf_term[token] = score_tf
             score_tf_term_keys = list(score_tf_term.keys())
             score_tf_term_values = list(score_tf_term.values())
             
@@ -174,11 +194,10 @@ def cosine_similarity(relevant_docs, query_vector, idf_vector, tf_vector):
         
         idf_term_new[doc] = final_score_idf_term
         tf_term_new[doc] = final_score_tf_term
-#    print("DICT_IDF:", idf_term_new)
-#    print("DICT_IDF:", (idf_list))    
+        tf_idf_term_new[doc] = final_score_tf_idf_term
     sorted_score_map_final = sorted(score_map_final.items(), key=operator.itemgetter(1), reverse=True)
 
-    return sorted_score_map_final[:50], tf_term_new, idf_term_new
+    return sorted_score_map_final[:50], tf_term_new, idf_term_new, tf_idf_term_new
 
 def get_results(query):
 #    print("I am getting you reults")
@@ -257,14 +276,14 @@ def eval_score(query):
         new = new_result.lower()
         new_score.append(new)
     
-    sorted_score_list_final, tf_new, idf_new = cosine_similarity(relevant, query_vector, idf_vector, tf_vector)
+    sorted_score_list_final, tf_new, idf_new, tf_idf_new = tf_idf_score(relevant, query_vector, idf_vector, tf_vector, processed_query)
 #    print("Compare_idf: ", tf_new)
     for entry in sorted_score_list_final:
         doc_id = entry[0]
 ##        print(entry[0])
         row = movie_row.loc[doc_id]
 #        print(row)
-        info = (row["Title"], row["Plot"] if isinstance(row["Plot"], str) else "", entry[1], idf_new[doc_id], tf_new[doc_id], row["imdbRating"])
+        info = (row["Title"], row["Plot"] if isinstance(row["Plot"], str) else "", entry[1], idf_new[doc_id], tf_new[doc_id], tf_idf_new[doc_id], row["imdbRating"])
         result.append(info)
     new_score = None
     print(result[0:5])

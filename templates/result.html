@@ -2,15 +2,25 @@
 <html>
     <head>
         <title>Which one will you watch?</title>
-
     </head>
     <style>
         body{
-            background-color:rgb(243, 245, 247);
+            background-color:rgb(12, 15, 19);
         }
         h1{
             text-align: center;
             font-size: 30px;
+            background-color:rgb(243, 94, 49);
+        }
+        h2{
+            text-align: left;
+            font-size: 25px;
+            background-color:rgb(243, 94, 49);
+        }
+        h3{
+            text-align: left;
+            font-size: 23px;
+            background-color:rgb(141, 122, 248);
         }
         li{
             font-family: "Times New Roman", Times, serif;
@@ -24,26 +34,52 @@
             background: #cce5ff;
             margin: 5px;
             font-family:'Times New Roman', Times, serif;
-            font-style: italic;
+            font-style: bold;
+            font-size: 20px;
+        }
+        table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        }
+        th, td {
+        padding: 15px;
+        }
+        p1{
+            text-align: center;
             font-size: 20px;
         }
     </style>
+
     <body>
         <h1>Movies you wanna watch!!!!!!!</h1>
-        <h2>Your TOP 10 Suggestions are: </h2>
-        <h3>{{ highlight_text}}</h3>
+         <h2>Your TOP 10 Suggestions are: </h2>
+        <h3>Your Keyword(s): {{ highlight_text}}</h3>
             <ul type=none>
                 {%for i in result%}
                 <li>
                     <!-- <p>Poster: {{i[0]}}</p> -->
-                    <p>Title: {{i[0]}}</p>
-                    <p>Plot: {{i[1]}}<mark></mark></p>
-                    <p>TF-IDF Score: {{i[2]}}</p>
-                    <p>IDF Score: {{i[3]}}</p>
-                    <p>TF Score: {{i[4]}}</p>
-                    <p>IMDB Rating: {{i[5]}}</p>
+                    <p1><strong>Title: {{i[0]}}</strong></p1>
+                    <p><strong>Plot: {{i[1]}}</strong><mark></mark></p>
+                    <table>
+                        <tr>
+                            <th>IDF Score: </th>
+                            <th>TF Score: </th>
+                            <th>TF-IDF Score for each term: </th>
+                            <th>Total TF-IDF Score: </th>
+                        </tr>
+                        <tr>
+                            <td>{{i[3]}}</td>
+                            <td>{{i[4]}}</td>
+                            <td>{{i[5]}}</td>
+                            <td>{{i[2]}}</td>
+                        </tr>
+                    </table>
+                    </tr>
+                    <p><strong>IMDB Rating: {{i[6]}}</strong></p>
                 </li>
                 {% endfor%}
-            </ul>
+            </ul> 
+
+        
     </body>
 </html>
