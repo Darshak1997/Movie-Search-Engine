@@ -6,6 +6,26 @@ Phase 1: Text Search
 
 I am doing a Movie Search Engine. So, on the server, a user can enter few keywords and from that keywords, we would rank what all movie are relevant to that free text.
 
+How do we do that:
+
+•	Preprocess our csv file.
+
+•	Tokenize the plot, converting our plot to the lower case, remove stop words.
+
+•	Create an inverted index.
+
+•	Build our document vector in which we calculate our TF-IDF scores.
+
+•	After that we calculate cosine similarity.
+
+•	After that save the inverted index in a .pkl file which will improve our searching speed.
+
+•	We then process our query or keywords that the user had entered and calculate total tf-idf score, idf score for individual query 	 term and tf score for individual query term.
+
+•	At last we print title, plot, tf-idf score, idf score, tf score and IMDB rating.
+
+Dataset: https://www.kaggle.com/beyjin/movies-1990-to-2017#Movie_Movies.csv
+
 
 Keyword: Kid alone at home
 
