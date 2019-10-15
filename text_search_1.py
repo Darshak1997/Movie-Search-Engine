@@ -215,17 +215,10 @@ def get_results(query):
 def initialize():
     global data_folder, credits_cols, movie_col, noise_list, credits_data, movie_row, N, tokenizer, stopword, stemmer, inverted_index, document_vector, lemmatizer 
 
-    # Data configurations
-    #data_folder = '/home/npandya/mysite/data/'
+   
     data_folder = 'F:/Data Mining/Assignments/Assignment 1/'
-#    credits_cols = {"id": None, "cast":['character', 'name'], "crew":['name']}
-#    meta_cols = {"id": None, "genres":['name'], "original_title":None, "overview":None,"poster_path":None,
-#                     "production_companies":['name'], "tagline":None}
+    
     movie_col = {"imdbID": None, "Title":None, "Plot":None, "imdbRating": None}
-
-    # Read data
-#    credits_data = pd.read_csv(data_folder +'credits.csv', usecols=credits_cols.keys(), index_col="id")
-#    meta_data = pd.read_csv(data_folder + 'movies_metadata.csv', usecols=meta_cols.keys(), index_col="id")
     
     movie_row = pd.read_csv(data_folder + 'Movie_movies.csv', usecols=movie_col.keys(), index_col="imdbID")
     # Total number of documents = number of rows in movies_metadata.csv
@@ -243,9 +236,6 @@ def initialize():
     print("Initialized")
 
 def build():
-#    print("I am Build")
-#    print("Creating inverted index for credits data...")
-#    create_inverted_index(credits_data, credits_cols)
     print("Creating inverted index for meta data...")
     create_inverted_index(movie_row, movie_col)
     print("Building doc vector...")
