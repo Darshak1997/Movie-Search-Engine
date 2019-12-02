@@ -24,7 +24,7 @@ How do we do that:
 
 •	At last we print title, plot, tf-idf score, idf score, tf score and IMDB rating.
 
-Dataset: https://www.kaggle.com/beyjin/movies-1990-to-2017#Movie_Movies.csv
+Dataset: https://www.kaggle.com/beyjin/movies-1990-to-2017#Movie_Movies.csv and also https://www.kaggle.com/rounakbanik/the-movies-dataset#movies_metadata.csv
 
 EXPERIMENTS:
 
