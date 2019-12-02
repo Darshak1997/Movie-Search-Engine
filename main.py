@@ -27,19 +27,6 @@ def query_search():
     print('Time: ', stop - start)  
     return render_template('result.html',result=res[0:10], highlight_text = highlight)
 
-#@application.route('/classify/', methods=['GET', 'POST'])
-#def query_classify():
-#    search_query = request.args.get('query','')
-#    
-#    import classifier_OG_train
-#    start = timeit.default_timer()
-#    res1, percentage=classifier_OG_train.get_results(search_query)
-#    print(res1, percentage)
-##    print(highlight)
-#    stop = timeit.default_timer()
-#    print('Time: ', stop - start)  
-#    return render_template('result_classify.html',result=res1, percentage_genre = percentage)
-
 @application.route('/image/', methods=['GET', 'POST'])
 def query_image():
     search_query = request.args.get('query','')
