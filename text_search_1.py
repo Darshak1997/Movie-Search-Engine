@@ -5,14 +5,18 @@ Created on Thu Oct 10 12:18:11 2019
 @author: Darshak
 """
 
+
 import pandas as pd
 import ast, math, operator, os, pickle
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
+import timeit
+from nltk.stem.snowball import SnowballStemmer
 
-def create_inverted_index(x_data, x_cols):
+create_inverted_index
+def Inverted_Index(x_data, x_cols):
 #    print("Hey I am Inverted Index")
     for row in x_data.itertuples():
         index = getattr(row, 'Index')
@@ -41,8 +45,11 @@ def create_inverted_index(x_data, x_cols):
                     value[index] = 1
                     value["df"] += 1
             else:
-                inverted_index[token] = {index: 1, "df": 1}  
+                inverted_index[token] = {index: 1, "df": 1} 
     stopwords_1()
+    build_doc_vector()
+    
+    
                 
                 
 def data_pre_processing(data_string):
@@ -50,7 +57,7 @@ def data_pre_processing(data_string):
     processed_data = []
     for t in tokens:
         if t not in stopword:
-            processed_data.append(lemmatizer.lemmatize(t).lower())
+            processed_data.append(stemmer.stem(t).lower())
     return processed_data
 
 def stopwords_1():
@@ -93,6 +100,9 @@ def build_doc_vector():
         normalize = math.sqrt(tf_idf_vector["_sum_"])
         for tf_idf_key in tf_idf_vector:
             tf_idf_vector[tf_idf_key] /= normalize
+            
+    pickle.dump(document_vector, open('documentVectorPickle.pkl', 'wb+'))
+    pickle.dump(inverted_index, open('invertedIndexPickle.pkl', 'wb+'))
 
 def relevant_files(query_list):
 #    print("I am getting relevant docs")
@@ -108,6 +118,7 @@ def relevant_files(query_list):
 
 def build_query_vector(processed_query):
 #    print("I am building query vector")
+    start = timeit.default_timer()
     query_vector = {}
     tf_vector = {}
     idf_vector = {}
@@ -117,28 +128,31 @@ def build_query_vector(processed_query):
 #            tf_idf = (1 + math.log10(processed_query.count(token))) * (math.log10(N/inverted_index[token]["df"]))
             tf = (1 + math.log10(processed_query.count(token)))
             tf_vector[token] = tf
-            print("tf_vector_for: ", processed_query.count(token))
+#            print("tf_vector_for: ", processed_query.count(token))
 #            tf_vector[]
             idf = (math.log10(N/inverted_index[token]["df"]))
             idf_vector[token] = idf
-            print("tf_vector_for: ", idf_vector[token])
+#            print("tf_vector_for: ", idf_vector[token])
             
             tf_idf = tf*idf
             query_vector[token] = tf_idf
             sum1 += math.pow(tf_idf, 2)
-            
+    stop = timeit.default_timer()
     print("IDF: ", idf_vector)
-    print("TF: ", tf_vector)
+#    print("TF: ", tf_vector)
     sum1 = math.sqrt(sum1)
     for token in query_vector:
         query_vector[token] /= sum1
 #    query_vector[token] = tf_idf
-    print("TF_IDF: ", query_vector)
-    return query_vector, idf_vector, tf_vector
+#    print("TF_IDF: ", query_vector)
     
+    print('Time: ', stop - start)
+    return query_vector, idf_vector, tf_vector
+
 
 def tf_idf_score(relevant_docs, query_vector, idf_vector, tf_vector, processed_query):
 #    print("I am cosine similarity")
+    
     score_map_final = {}
     score_map_idf = {}
     score_map_tf = {}
@@ -167,7 +181,7 @@ def tf_idf_score(relevant_docs, query_vector, idf_vector, tf_vector, processed_q
             
             final_score_tf_idf_term = list(zip(score_tf_idf_term_keys, score_tf_idf_term_values))
             
-        for token in query_vector:
+        for token in idf_vector:
 #            print(idf_vector[token]*(document_vector[doc][token] if token in document_vector[doc] else 0))
             score_idf = idf_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
 #            print("token: ", token, "Score: ",score_idf)
@@ -196,7 +210,7 @@ def tf_idf_score(relevant_docs, query_vector, idf_vector, tf_vector, processed_q
         tf_term_new[doc] = final_score_tf_term
         tf_idf_term_new[doc] = final_score_tf_idf_term
     sorted_score_map_final = sorted(score_map_final.items(), key=operator.itemgetter(1), reverse=True)
-
+    
     return sorted_score_map_final[:50], tf_term_new, idf_term_new, tf_idf_term_new
 
 def get_results(query):
@@ -207,49 +221,51 @@ def get_results(query):
         inverted_index = pickle.load(open('invertedIndexPickle.pkl', 'rb'))
         document_vector = pickle.load(open('documentVectorPickle.pkl', 'rb'))
     else:
-        print("In else of get_scores:")
-        build()
-        save()
-    return eval_score(query)
+#        print("In else of get_scores:")
+        Inverted_Index(movie_row, movie_col)
+    return Score_TF_IDF(query)
 
+
+#movie_col
 def initialize():
-    global data_folder, credits_cols, movie_col, noise_list, credits_data, movie_row, N, tokenizer, stopword, stemmer, inverted_index, document_vector, lemmatizer 
+    
+    global credits_cols, movie_col, noise_list, credits_data, movie_row, N, tokenizer, stopword, stemmer, inverted_index, document_vector, lemmatizer, stemmer_snow
 
-   
-    data_folder = 'F:/Data Mining/Assignments/Assignment 1/'
-    
+    # Data configurations
+    #data_folder = '/home/npandya/mysite/data/'
+#    data_folder = 'F:/Data Mining/Assignments/Assignment 1/'
+#    credits_cols = {"id": None, "cast":['character', 'name'], "crew":['name']}
+#    meta_cols = {"id": None, "genres":['name'], "original_title":None, "overview":None,"poster_path":None,
+#                     "production_companies":['name'], "tagline":None}
     movie_col = {"imdbID": None, "Title":None, "Plot":None, "imdbRating": None}
+
+    # Read data
+#    credits_data = pd.read_csv(data_folder +'credits.csv', usecols=credits_cols.keys(), index_col="id")
+#    meta_data = pd.read_csv(data_folder + 'movies_metadata.csv', usecols=meta_cols.keys(), index_col="id")
     
-    movie_row = pd.read_csv(data_folder + 'Movie_movies.csv', usecols=movie_col.keys(), index_col="imdbID")
+    movie_row = pd.read_csv('Movie_Movies.csv', usecols=movie_col.keys(), index_col="imdbID")
+    
     # Total number of documents = number of rows in movies_metadata.csv
     movie_row = movie_row.dropna(subset = ["Plot"])
+    
     N = movie_row.shape[0]
 
     # Pre-processing initialization
+    
     tokenizer = RegexpTokenizer(r'[a-zA-Z0-9]+')
     stopword = stopwords.words('english')
     stemmer = PorterStemmer()
-    lemmatizer = WordNetLemmatizer()
+    stemmer_snow = SnowballStemmer("english")
+#    lemmatizer = WordNetLemmatizer()
 
     inverted_index = {}
     document_vector = {}
+    
     print("Initialized")
-
-def build():
-    print("Creating inverted index for meta data...")
-    create_inverted_index(movie_row, movie_col)
-    print("Building doc vector...")
-    build_doc_vector()
-    print("Built index and doc vector")
-
-def save():
-#    print("I am Save")
-    pickle.dump(inverted_index, open('invertedIndexPickle.pkl', 'wb+'))
-    pickle.dump(document_vector, open('documentVectorPickle.pkl', 'wb+'))
-    print("Saved both")
-
-def eval_score(query):
+e
+def Score_TF_IDF(query):
 #    print("I am Evaluating score")
+    
     result = []
     
     processed_query = data_pre_processing(query)
@@ -277,12 +293,16 @@ def eval_score(query):
         result.append(info)
     new_score = None
     print(result[0:5])
+#    print("Our keyword(s):", processed_query)
     return result, processed_query
 
 
 
-#search_query = "Kid alone at home"
-#get_results(search_query)
+search_query = "dinosaurs in the jungle"
+start = timeit.default_timer()
+get_results(search_query)
+stop = timeit.default_timer()
+print('Time: ', stop - start)
 
 
 
