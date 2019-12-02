@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Which Image? </title>
+    </head>
+    <style>
+        body{
+            background-color: rgb(236, 232, 227);
+        }
+    </style>
+    <body>
+        <h1>  Images that matches your query:   </h1>
+        <h2>Your Keyword(s): {{ query }}</h2>
+        {% for i in result %}
+        -----------------------------------------------------------------------------------------------
+        <li>
+            
+            <p1><strong> Caption: {{i[0] | replace("[", "") | replace("]", "") | replace("<end>", "") | replace(",", " ") | replace("'", "")}}</strong></p1>
+            <p>
+            <img src = {{i[1]}}>
+            </p>
+            <p1><strong>TF/IDF: {{i[2]}}</strong></p1>
+        </li>
+        {% endfor%}
+    </body>
+</html>
