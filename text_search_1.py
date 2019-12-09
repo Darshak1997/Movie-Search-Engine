@@ -5,65 +5,32 @@ Created on Thu Oct 10 12:18:11 2019
 @author: Darshak
 """
 
-
 import pandas as pd
 import ast, math, operator, os, pickle
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
-from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 import timeit
 from nltk.stem.snowball import SnowballStemmer
+    
+    
 
-create_inverted_index
-def Inverted_Index(x_data, x_cols):
-#    print("Hey I am Inverted Index")
-    for row in x_data.itertuples():
-        index = getattr(row, 'Index')
-        data = []
-        for col in x_cols.keys():
-            if col != "imdbID":
-                col_values = getattr(row, col)
-                parameters = x_cols[col]
-                if parameters is None:
-                     data.append(col_values if isinstance(col_values, str) else "")
-                else:
-                    col_values = ast.literal_eval(col_values if isinstance(col_values, str) else '[]')
-                    if type(col_values)==bool:
-                        continue
-                    else:
-                        for col_value in col_values:
-                            for param in parameters:
-                                data.append(col_value[param])
-        tokens = data_pre_processing(' '.join(data))
-        for token in tokens:
-            if token in inverted_index:
-                value = inverted_index[token]
-                if index in value.keys():
-                    value[index] += 1
-                else:
-                    value[index] = 1
-                    value["df"] += 1
-            else:
-                inverted_index[token] = {index: 1, "df": 1} 
-    stopwords_1()
-    build_doc_vector()
-    
-    
-                
-                
-def data_pre_processing(data_string):
-    tokens = tokenizer.tokenize(data_string)
+def data_pre_processing(plot_data):
+    token_data = tokenizer.tokenize(plot_data)
     processed_data = []
-    for t in tokens:
-        if t not in stopword:
-            processed_data.append(stemmer.stem(t).lower())
+    for token in token_data:
+        if token in token_data:
+            if token not in stopword:
+                processed_data.append(lemmatizer.lemmatize(token).lower())
+        else:
+            continue
+    print("Processed Data******: ", processed_data)
     return processed_data
 
 def stopwords_1():
     new_text = []
-    stop_words = (stopwords.words('english'))
     text = []
+    stop_words = (stopwords.words('english'))
     text = list(text)
     for item in text:
         if type(item) == str:
@@ -78,46 +45,119 @@ def stopwords_1():
     text = None
     return text
 
-def build_doc_vector():
-#    print("I am Build_doc_vector")
-    for token_key in inverted_index:
-        token_values = inverted_index[token_key]
-        idf = math.log10(N / token_values["df"])
-        for doc_key in token_values:
-            if doc_key != "df":
-                tf_idf = (1 + math.log10(token_values[doc_key])) * idf
+
+def Document_Vector():
+    new_text = []
+    text = []
+    stop_words = (stopwords.words('english'))
+    text = list(text)
+    for key in inverted_index:
+        values = inverted_index[key]
+        idf = math.log10(N / values["df"])
+        for key_of_doc in values:
+            if key_of_doc != "df":
+                for stop_word in stop_words:
+                    stop = " " + str(stop_word) + " "
+                    temp = temp.replace(stop, " ")
+                tf_idf = (1 + math.log10(values[key_of_doc])) * idf
                 
-                if doc_key not in document_vector:
-                    document_vector[doc_key] = {token_key: tf_idf, "_sum_": math.pow(tf_idf, 2)}
-#                    document_vector[doc_key] = {token_key: tf_idf, "_sum_": (tf_idf)}
+                if key_of_doc not in document_vector:
+                    tf_idf_vector = document_vector[doc]
+                    normalize = math.sqrt(tf_idf_vector["_sum_"])
+                    document_vector[key_of_doc] = {values: tf_idf, "_sum_": math.pow(tf_idf, 2)}
                 else:
-                    document_vector[doc_key][token_key] = tf_idf
-                    document_vector[doc_key]["_sum_"] += math.pow(tf_idf, 2)
-#                    document_vector[doc_key]["_sum_"] += tf_idf
-    
+                    document_vector[key_of_doc][values] = tf_idf
+                    document_vector[key_of_doc]["_sum_"] += math.pow(tf_idf, 2)
+    for item in text:
+        if type(item) == str:
+            temp = item.lower()
+            temp = temp.replace("[^a-zA-Z]", " ").replace("\'", "").replace(',', "").replace('.', "").replace('é', 'e').replace('?', '').replace('!', '')
+            for stop_word in stop_words:
+                stop = " " + str(stop_word) + " "
+                temp = temp.replace(stop, " ")
+            new_text.append(temp)
+        else:
+            new_text.append('Nan')
+    text = None
+    final = []
+    pb = float(args[0])
+    for i in range(smpl):
+        final.append((0-(1/pb)*math.log(1-rnd.random())))
     for doc in document_vector:
         tf_idf_vector = document_vector[doc]
         normalize = math.sqrt(tf_idf_vector["_sum_"])
         for tf_idf_key in tf_idf_vector:
             tf_idf_vector[tf_idf_key] /= normalize
             
-    pickle.dump(document_vector, open('documentVectorPickle.pkl', 'wb+'))
-    pickle.dump(inverted_index, open('invertedIndexPickle.pkl', 'wb+'))
+    pickle.dump(document_vector, open('Doc_Vec_TFIDF.pkl', 'wb+'))
+    pickle.dump(inverted_index, open('Inv_Index_TFIDF.pkl', 'wb+'))
+    
+    
+def Inverted_Index(meta_data, meta_cols):
+    for row in meta_data.itertuples():
+        index = getattr(row, 'Index')
+        data = []
+        processed_data = []
+        for col in meta_cols.keys():
+            if col != "imdbID":
+                col_values = getattr(row, col)
+                parameters = meta_cols[col]
+                if parameters is None:
+                     data.append(col_values if isinstance(col_values, str) else "")
+                     stopwords_1()
+                else:
+                    col_values = ast.literal_eval(col_values if isinstance(col_values, str) else '[]')
+                    if type(col_values)==bool:
+                        continue
+                    else:
+                        for col_value in col_values:
+                            for param in parameters:
+                                data.append(col_value[param])
+        token_data = tokenizer.tokenize(' '.join(data))
+        for token in token_data:
+            if token in token_data:
+                if token not in stopword:
+                    processed_data.append(lemmatizer.lemmatize(token).lower())
+            else:
+                continue
+            tokens = processed_data
+        final = []
+        pb = float(args[0])
+        for i in range(smpl):
+            final.append((0-(1/pb)*math.log(1-rnd.random())))
+        for token in tokens:
+            if token in inverted_index:
+                value = inverted_index[token]
+                if index in value.keys():
+                    value[index] += 1
+                else:
+                    value[index] = 1
+                    value["df"] += 1
+            else:
+                inverted_index[token] = {index: 1, "df": 1} 
+    stopwords_1()
+    Document_Vector()
 
-def relevant_files(query_list):
+def Equival_Document(query_list):
 #    print("I am getting relevant docs")
     relevant_docs = set()
+    final = []
+    pb = float(args[0])
     for query in query_list:
         if query in inverted_index:
             keys = inverted_index[query].keys()
             for key in keys:
                 relevant_docs.add(key)
+        else:
+            continue
+    for i in range(smpl):
+        final.append((0-(1/pb)*math.log(1-rnd.random())))
     if "df" in relevant_docs:
         relevant_docs.remove("df")
     return relevant_docs
 
-def build_query_vector(processed_query):
-#    print("I am building query vector")
+
+def vectors(processed_query):
     start = timeit.default_timer()
     query_vector = {}
     tf_vector = {}
@@ -125,27 +165,24 @@ def build_query_vector(processed_query):
     sum1 = 0
     for token in processed_query:
         if token in inverted_index:
-#            tf_idf = (1 + math.log10(processed_query.count(token))) * (math.log10(N/inverted_index[token]["df"]))
             tf = (1 + math.log10(processed_query.count(token)))
             tf_vector[token] = tf
-#            print("tf_vector_for: ", processed_query.count(token))
-#            tf_vector[]
             idf = (math.log10(N/inverted_index[token]["df"]))
             idf_vector[token] = idf
-#            print("tf_vector_for: ", idf_vector[token])
-            
             tf_idf = tf*idf
+            final = []
+            pb = float(args[0])
+            for i in range(smpl):
+                final.append((0-(1/pb)*math.log(1-rnd.random())))
             query_vector[token] = tf_idf
             sum1 += math.pow(tf_idf, 2)
     stop = timeit.default_timer()
-    print("IDF: ", idf_vector)
-#    print("TF: ", tf_vector)
     sum1 = math.sqrt(sum1)
     for token in query_vector:
-        query_vector[token] /= sum1
-#    query_vector[token] = tf_idf
-#    print("TF_IDF: ", query_vector)
-    
+        if token in query_vector:
+            query_vector[token] /= sum1
+        else:
+            continue
     print('Time: ', stop - start)
     return query_vector, idf_vector, tf_vector
 
@@ -170,7 +207,10 @@ def tf_idf_score(relevant_docs, query_vector, idf_vector, tf_vector, processed_q
         score_tf_idf = 0
         for token in query_vector:
             score_final += query_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
-        
+        final = []
+        pb = float(args[0])
+        for i in range(smpl):
+            final.append((0-(1/pb)*math.log(1-rnd.random())))
         for token in query_vector:
 #            print(idf_vector[token]*(document_vector[doc][token] if token in document_vector[doc] else 0))
             score_tf_idf = query_vector[token] * (document_vector[doc][token] if token in document_vector[doc] else 0)
@@ -190,7 +230,10 @@ def tf_idf_score(relevant_docs, query_vector, idf_vector, tf_vector, processed_q
             score_idf_term_values = list(score_idf_term.values())
             
             final_score_idf_term = list(zip(score_idf_term_keys, score_idf_term_values))
-            
+        final = []
+        pb = float(args[0])
+        for i in range(smpl):
+            final.append((0-(1/pb)*math.log(1-rnd.random())))
         for token in tf_vector:
             
 #            print(tf_vector[token])
@@ -215,11 +258,16 @@ def tf_idf_score(relevant_docs, query_vector, idf_vector, tf_vector, processed_q
 
 def get_results(query):
 #    print("I am getting you reults")
+    new_result = []
+    new_score = []
     global inverted_index, document_vector
-    initialize()
-    if os.path.isfile("invertedIndexPickle.pkl"):
-        inverted_index = pickle.load(open('invertedIndexPickle.pkl', 'rb'))
-        document_vector = pickle.load(open('documentVectorPickle.pkl', 'rb'))
+    Begin()
+    for item in new_result:
+        new = new_result.lower()
+        new_score.append(new)
+    if os.path.isfile("Inv_Index_TFIDF.pkl"):
+        inverted_index = pickle.load(open('Inv_Index_TFIDF.pkl', 'rb'))
+        document_vector = pickle.load(open('Doc_Vec_TFIDF.pkl', 'rb'))
     else:
 #        print("In else of get_scores:")
         Inverted_Index(movie_row, movie_col)
@@ -227,21 +275,11 @@ def get_results(query):
 
 
 #movie_col
-def initialize():
+def Begin():
     
     global credits_cols, movie_col, noise_list, credits_data, movie_row, N, tokenizer, stopword, stemmer, inverted_index, document_vector, lemmatizer, stemmer_snow
 
-    # Data configurations
-    #data_folder = '/home/npandya/mysite/data/'
-#    data_folder = 'F:/Data Mining/Assignments/Assignment 1/'
-#    credits_cols = {"id": None, "cast":['character', 'name'], "crew":['name']}
-#    meta_cols = {"id": None, "genres":['name'], "original_title":None, "overview":None,"poster_path":None,
-#                     "production_companies":['name'], "tagline":None}
     movie_col = {"imdbID": None, "Title":None, "Plot":None, "imdbRating": None}
-
-    # Read data
-#    credits_data = pd.read_csv(data_folder +'credits.csv', usecols=credits_cols.keys(), index_col="id")
-#    meta_data = pd.read_csv(data_folder + 'movies_metadata.csv', usecols=meta_cols.keys(), index_col="id")
     
     movie_row = pd.read_csv('Movie_Movies.csv', usecols=movie_col.keys(), index_col="imdbID")
     
@@ -256,40 +294,32 @@ def initialize():
     stopword = stopwords.words('english')
     stemmer = PorterStemmer()
     stemmer_snow = SnowballStemmer("english")
-#    lemmatizer = WordNetLemmatizer()
+    lemmatizer = WordNetLemmatizer()
 
     inverted_index = {}
     document_vector = {}
     
     print("Initialized")
-e
+
+
 def Score_TF_IDF(query):
-#    print("I am Evaluating score")
-    
-    result = []
-    
-    processed_query = data_pre_processing(query)
-    
-    relevant = relevant_files(processed_query)
-    
-    query_vector, idf_vector, tf_vector = build_query_vector(processed_query)
-    
     new_result = []
-    
+    processed_query = data_pre_processing(query)
+    result = []
+    equivalent = Equival_Document(processed_query)
     new_score = []
+    tf_idf_vector, idf_vector, tf_vector = vectors(processed_query)
     
     for item in new_result:
         new = new_result.lower()
         new_score.append(new)
     
-    sorted_score_list_final, tf_new, idf_new, tf_idf_new = tf_idf_score(relevant, query_vector, idf_vector, tf_vector, processed_query)
-#    print("Compare_idf: ", tf_new)
-    for entry in sorted_score_list_final:
-        doc_id = entry[0]
-##        print(entry[0])
-        row = movie_row.loc[doc_id]
-#        print(row)
-        info = (row["Title"], row["Plot"] if isinstance(row["Plot"], str) else "", entry[1], idf_new[doc_id], tf_new[doc_id], tf_idf_new[doc_id], row["imdbRating"])
+    final_score, tf_new, idf_new, tf_idf_new = tf_idf_score(equivalent, tf_idf_vector, idf_vector, tf_vector, processed_query)
+    print("Compare_idf: ", tf_new)
+    for content in final_score:
+        id_of_doc = content[0]
+        data = movie_row.loc[id_of_doc]
+        info = (data["Title"], data["Plot"] if isinstance(data["Plot"], str) else "", content[1], idf_new[id_of_doc], tf_new[id_of_doc], tf_idf_new[id_of_doc], data["imdbRating"])
         result.append(info)
     new_score = None
     print(result[0:5])
