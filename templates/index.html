@@ -1,40 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <title>Movie Search Engine</title>
-    <meta charset="utf-8"/>
-  </head>
-  <style>
-	  form{
-		font-size: 40px;
-        line-height: 500px;
-		text-align: center;
-		background-color: rgb(102, 77, 248);
-	  } 
-	  body{
-		  font-size: 40px;
-          line-height: 500px;
-		  text-align: center;
-		  background-color: rgb(17, 12, 6);
-	  }
-	  button{
-		font-size: 25px;
-	  }
-	  h1{
-		background-image: url('/Icon.png');
-		background-size: cover;
-		background-color: rgb(243, 94, 49);
-		font-size: 40px;
-		line-height: 100px;
-		text-align: center;
-	  }
-  </style>
-  <body style="background-image: url('Icon.png');">
-	<h1>Movie Search Engine!!</h1>
-    <form method="GET" action="/search/">
-       <label>Enter Keywords: <input type="text" name="query"/></label>
-	   <button type="submit" value="submit">Search</button>
-	</form>
-  </body>
+<head>
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.css">
+	<link rel="stylesheet" type="text/css" href="app.css">
+	<title>Movie Search Engine</title>
+	<meta charset="utf-8"/>
+</head>
+<body>
+	<div class="ui fixed inverted menu">
+		<div class="ui container">
+			<div class="header item"><i class="code icon"></i><a href="/"> Movie Search Engine</a></div>
+			<a class="item" href="/search/">Text Search</a>
+			<a class="item" href="/classify/">Genre Classification</a>
+			<a class="item" href="/image/">Image Search</a>
+		</div>
+	</div>
+	<div class="ui main text container">
+		<br>
+		<br>
+			<div class="ui top attached segment">
+				<div class="ui link cards">
+					<div class="card">
+						<div class="image">
+							<img src="https://qph.fs.quoracdn.net/main-qimg-cf70dab15824a8ac5baf8c44e48140ce">
+						</div>
+						<div class="content">
+							<a class="header">Text Search</a>
+						</div>
+						<div class="ui form">
+							<form method="GET" action="/search/">
+								<div class="field">
+								   <label>Enter Keywords-</label>
+								   <input type="text" name="query"/>
+								</div>
+								<button class="ui primary button">
+									Next
+								</button>
+							</form>
+						</div>
+					</div>
+					<div class="card">
+						<div class="image">
+							<img src="https://cdn.dribbble.com/users/297042/screenshots/1056368/movieicons-01.png">
+						</div>
+						<div class="content">
+							<a class="header">Genre Classification</a>
+						</div>
+						<div class="ui form">
+							<form method="GET" action="/classify/">
+								<div class="field">
+									<label>Enter Keywords-</label>
+									<input type="text" name="query"/>
+								</div>
+								<button class="ui primary button">
+									Next
+								</button>
+							 </form>
+						</div>
+					</div>
+					<div class="card">
+						<div class="image">
+							<img src="http://images6.fanpop.com/image/photos/35800000/-Wallpapers-Full-HD-random-35881384-1920-1080.jpg">
+						</div>
+						<div class="content">
+							<a class="header">Image Search</a>
+						</div>
+						<div class="ui form">
+							<form method="GET" action="/image/">
+								<div class="field">
+									<label>Enter Keywords-</label>
+									<input type="text" name="query"/>
+								</div>
+								<button class="ui primary button">
+									Next
+								</button>
+							 </form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
 </html>
