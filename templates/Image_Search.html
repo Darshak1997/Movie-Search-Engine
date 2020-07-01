@@ -1,26 +1,68 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Which Image? </title>
+        <title>Movie Search Engine</title>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.css">
+        <link rel="stylesheet" type="text/css" href="app.css">
     </head>
-    <style>
-        body{
-            background-color: rgb(236, 232, 227);
-        }
-    </style>
     <body>
-        <h1>  Images that matches your query:   </h1>
-        <h2>Your Keyword(s): {{ query }}</h2>
-        {% for i in result %}
-        -----------------------------------------------------------------------------------------------
-        <li>
-            
-            <p1><strong> Caption: {{i[0] | replace("[", "") | replace("]", "") | replace("<end>", "") | replace(",", " ") | replace("'", "")}}</strong></p1>
-            <p>
-            <img src = {{i[1]}}>
-            </p>
-            <p1><strong>TF/IDF: {{i[2]}}</strong></p1>
-        </li>
-        {% endfor%}
-    </body>
+        <div class="ui fixed inverted menu">
+            <div class="ui container">
+                <div class="header item"><i class="code icon"></i><a href="/"> Movie Search Engine</a></div>
+                <a class="item" href="/search/">Text Search</a>
+                <a class="item" href="/classify/">Genre Classification</a>
+                <a class="item" href="/image/">Image Search</a>
+            </div>
+          </div>
+          <div class="ui main text container">
+            <br>
+            <br>
+            <div class="ui form">
+                <form method="GET" action="/image/">
+                    <div class="field">
+                       <label>Enter Keywords-</label>
+                       <input type="text" name="query"/ placeholder="{{search_query}}">
+                    </div>
+                    <button class="ui primary button">
+                        Next
+                    </button>
+                </form>
+            </div>
+            <nobr> ({{totalTime}} Seconds To Load)&nbsp;</nobr>
+            <div class="ui top attached segment">
+                <div class="ui huge header">Images that matches your query: </div>
+                    <h2>Your Keyword(s): {{ highlights }}</h2>
+                    <div class="ui divided items">
+                        {% for i in result %}
+                        <div class="item">
+                            <div class="image">
+                                <img src = {{i[0]}}>
+                            </div>
+                            <div class="content">
+                                <div class="description">
+                                    <p1 class = "mark"><strong> Caption: {{i[1] | replace("[", "") | replace("]", "") | replace("<end>", "") | replace(",", " ") | replace("'", "") | safe}}</strong></p1>
+                                </div>
+                                <div class="extra">
+                                    <div class="ui label">TF-IDF Score: {{i[2]}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor%}
+                    </body>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/7.0.0/mark.min.js"></script>
+                    <script type="text/javascript">
+                            var tokens = {{ highlights | safe }} ;
+                            x = document.querySelectorAll(".mark");
+                            for (i = 0; i < x.length; i++) {
+                                var instance = new Mark(x[i]);
+                                instance.mark(tokens, {
+                                    accuracy: {
+                                        value: "exactly",
+                                        limiters: [".", ",", "!", ""]
+                                    }
+                                });
+                            }
+                    </script>
+            </div>
+
 </html>
