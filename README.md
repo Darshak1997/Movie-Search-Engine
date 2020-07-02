@@ -3,6 +3,7 @@ Blogs for this project:
 1. https://darshakrairakhia.wordpress.com/text-search/
 2. https://darshakrairakhia.wordpress.com/text-classification/
 3. https://darshakrairakhia.wordpress.com/image-captioning/
+
 There are two phases in this project.
 
 Phase 1: Text Search
